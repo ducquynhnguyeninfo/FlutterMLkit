@@ -1,0 +1,2 @@
+ninja: Entering directory `/Users/ndquynh/developments/ml_facedetection/android/app/.cxx/cmake/debug/x86'
+ninja: no work to do.
