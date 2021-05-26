@@ -33,7 +33,6 @@ class _FaceDetectorCameraState extends State<FaceDetectorCamera> {
     super.initState();
   }
 
-
   @override
   void dispose() {
     faceDetector.close();
@@ -65,18 +64,20 @@ class _FaceDetectorCameraState extends State<FaceDetectorCamera> {
           inputImage.inputImageData!.size,
           inputImage.inputImageData!.imageRotation);
       try {
-        var croppedImages = await cropFaces(faces, cameraImage);
+        var croppedFaces = await cropFaces(faces, cameraImage);
         customPaint = CustomPaint(
           painter: painter,
           child: Align(
-            alignment: Alignment.bottomLeft,
-            child: SizedBox(
-              width: 100,
-              height: 100,
-              child: Image.memory(
-                Uint8List.fromList(image_.encodeJpg(croppedImages)),
-                scale: 0.1,
-              ),
+            alignment: Alignment.bottomCenter,
+            child: Row(
+              children: croppedFaces.map((e) => SizedBox(
+                width: 100,
+                height: 100,
+                child: Image.memory(
+                  Uint8List.fromList(image_.encodeJpg(e)),
+                  scale: 0.1,
+                ),
+              )).toList()
             ),
           ),
         );
@@ -93,22 +94,29 @@ class _FaceDetectorCameraState extends State<FaceDetectorCamera> {
     }
   }
 
-  Future<image_.Image> cropFaces(
+  Future<List<image_.Image>> cropFaces(
       List<Face> faces, CameraImage? cameraImage) async {
-    List cropImages = [];
-    List<Map<String, int>> faceMaps = [];
+    List<image_.Image> cropImages = [];
+    // List<Map<String, int>> faceMaps = [];
+
+    var image = await _cameraImageConverter.convert(cameraImage!);
+    // cropImages.add(jpeg);
+
+    var rotatedImage = image_.copyRotate(image, 180);
+
     for (Face face in faces) {
       int x = face.boundingBox.left.toInt();
       int y = face.boundingBox.top.toInt();
       int w = face.boundingBox.width.toInt();
       int h = face.boundingBox.height.toInt();
-      Map<String, int> thisMap = {'x': x, 'y': y, 'w': w, 'h': h};
-      faceMaps.add(thisMap);
+      // Map<String, int> thisMap = {'x': x, 'y': y, 'w': w, 'h': h};
+      // faceMaps.add(thisMap);
+
+      var copyCropFace = image_.copyCrop(rotatedImage, x, y, w, h);
+      cropImages.add(copyCropFace);
     }
 
-    var image = _cameraImageConverter.convert(cameraImage!);
-    // cropImages.add(jpeg);
-    return image;
+    return cropImages;
   }
 }
 
