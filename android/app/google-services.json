@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "900823658895",
+    "project_id": "mlflutter-dd095",
+    "storage_bucket": "mlflutter-dd095.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:900823658895:android:a3b08afa0cae41b8c2dbfa",
+        "android_client_info": {
+          "package_name": "com.ndq.ml_facedetection"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "900823658895-3ddivpulja5t2q7pct49snkb4uqh427g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxafnfJw_TOUnUnI907-tOIIkUDnz9sfc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "900823658895-3ddivpulja5t2q7pct49snkb4uqh427g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

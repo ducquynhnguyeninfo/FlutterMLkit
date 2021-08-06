@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/ndquynh/developments/ml_facedetection/android/CMakeLists.txt",
+    "/Users/ndquynh/Library/Android/sdk/ndk/21.1.6352462/build/cmake/android.toolchain.cmake",
+    "/Users/ndquynh/Library/Android/sdk/ndk/21.1.6352462/build/cmake/platforms.cmake"
+  ],
+  "cleanCommands": [
+    "/Users/ndquynh/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/ndquynh/developments/ml_facedetection/android/app/.cxx/cmake/debug/x86_64\" clean"
+  ],
+  "buildTargetsCommand": "/Users/ndquynh/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja  -C \"/Users/ndquynh/developments/ml_facedetection/android/app/.cxx/cmake/debug/x86_64\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "convertImage-Debug-x86_64": {
+      "artifactName": "convertImage",
+      "buildCommand": "/Users/ndquynh/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/ndquynh/developments/ml_facedetection/android/app/.cxx/cmake/debug/x86_64\" convertImage",
+      "abi": "x86_64",
+      "output": "/Users/ndquynh/developments/ml_facedetection/build/app/intermediates/cmake/debug/obj/x86_64/libconvertImage.so",
+      "runtimeFiles": []
+    }
+  }
+}
