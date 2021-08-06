@@ -35,6 +35,7 @@ dependencies:
   image: ^3.0.2
   camera: ^0.8.1
   bitmap: ^0.1.2
+  web_socket_channel: ^2.1.0
   ffi: ^1.0.0
 
 dev_dependencies:

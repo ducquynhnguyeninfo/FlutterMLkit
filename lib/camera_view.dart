@@ -9,11 +9,6 @@ import 'package:image_picker/image_picker.dart';
 
 import 'main.dart';
 
-typedef convert_func = Pointer<Uint32> Function(
-    Pointer<Uint8>, Pointer<Uint8>, Pointer<Uint8>, Int32, Int32, Int32, Int32);
-typedef Convert = Pointer<Uint32> Function(
-    Pointer<Uint8>, Pointer<Uint8>, Pointer<Uint8>, int, int, int, int);
-
 enum ScreenMode { liveFeed, gallery }
 
 class CameraView extends StatefulWidget {
@@ -39,19 +34,12 @@ class _CameraViewState extends State<CameraView> {
   ImagePicker? _imagePicker;
   int _cameraIndex = 0;
 
-  final DynamicLibrary convertImageLib = Platform.isAndroid
-      ? DynamicLibrary.open("libconvertImage.so")
-      : DynamicLibrary.process();
-  late Convert conv;
-
-
   @override
   void initState() {
     super.initState();
     _imagePicker = ImagePicker();
     if (cameras.length > 1) _cameraIndex = 1;
     _startLiveFeed();
-    conv = convertImageLib.lookup<NativeFunction<convert_func>>('convertImage').asFunction<Convert>();
 
   }
 
@@ -66,6 +54,7 @@ class _CameraViewState extends State<CameraView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 20.0),

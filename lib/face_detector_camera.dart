@@ -4,11 +4,14 @@ import 'dart:ui' as ui;
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
-import 'package:ml_facedetection/camera_image_converter.dart';
+import 'package:ml_facedetection/models/recognition_model.dart';
+import 'package:ml_facedetection/services/camera_image_converter.dart';
 import 'package:ml_facedetection/camera_view.dart';
 import 'package:ml_facedetection/painters/face_detector_painter.dart';
 import 'package:image/image.dart' as image_;
-import 'package:bitmap/bitmap.dart' as bitmap;
+import 'package:ml_facedetection/services/streaming_service.dart';
+
+import 'home.dart';
 
 class FaceDetectorCamera extends StatefulWidget {
   @override
@@ -27,15 +30,18 @@ class _FaceDetectorCameraState extends State<FaceDetectorCamera> {
   CustomPaint? customPaint;
 
   CameraImageConverter _cameraImageConverter = CameraImageConverter();
+  late StreamingService _streamingService;
 
   @override
   void initState() {
     super.initState();
+    _streamingService = StreamingService(this.onServerFeedback);
   }
 
   @override
   void dispose() {
     faceDetector.close();
+    _streamingService.dispose();
     super.dispose();
   }
 
@@ -68,18 +74,7 @@ class _FaceDetectorCameraState extends State<FaceDetectorCamera> {
         customPaint = CustomPaint(
           painter: painter,
           child: Align(
-            alignment: Alignment.bottomCenter,
-            child: Row(
-              children: croppedFaces.map((e) => SizedBox(
-                width: 100,
-                height: 100,
-                child: Image.memory(
-                  Uint8List.fromList(image_.encodeJpg(e)),
-                  scale: 0.1,
-                ),
-              )).toList()
-            ),
-          ),
+              alignment: Alignment.bottomCenter, child: faceView(croppedFaces)),
         );
       } catch (e) {
         print(e);
@@ -97,32 +92,65 @@ class _FaceDetectorCameraState extends State<FaceDetectorCamera> {
   Future<List<image_.Image>> cropFaces(
       List<Face> faces, CameraImage? cameraImage) async {
     List<image_.Image> cropImages = [];
-    // List<Map<String, int>> faceMaps = [];
 
     var image = await _cameraImageConverter.convert(cameraImage!);
-    // cropImages.add(jpeg);
-
-    var rotatedImage = image_.copyRotate(image, 180);
 
     for (Face face in faces) {
       int x = face.boundingBox.left.toInt();
       int y = face.boundingBox.top.toInt();
       int w = face.boundingBox.width.toInt();
       int h = face.boundingBox.height.toInt();
-      // Map<String, int> thisMap = {'x': x, 'y': y, 'w': w, 'h': h};
-      // faceMaps.add(thisMap);
 
-      var copyCropFace = image_.copyCrop(rotatedImage, x, y, w, h);
+      if (faces.length < 2) {
+        image = image_.copyRotate(image, 180);
+      }
+
+      var copyCropFace = image_.copyCrop(image, x, y, w, h);
+      var encodeJpg = image_.encodeJpg(copyCropFace);
+      addToFaceStorage(encodeJpg);
+
       cropImages.add(copyCropFace);
+      if (faceDetector.options.enableTracking) {
+        var trackingId = face.trackingId;
+
+        _streamingService.send = UnrecognizedFace(
+          trackingId: trackingId,
+          faceBytes: encodeJpg,
+          position: [x, y, w, h],
+        ).toJson();
+
+        // _streamingService.send = trackingId.toString();
+      }
     }
 
     return cropImages;
   }
-}
 
-Future<ui.Image> bytesToImage(Uint8List imgBytes) async {
-  ui.Codec codec = await ui.instantiateImageCodec(imgBytes);
-  ui.FrameInfo frame = await codec.getNextFrame();
+  Widget faceView(List<image_.Image> croppedFaces) {
+    return GridView(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 6,
+      ),
+      physics: NeverScrollableScrollPhysics(),
+      // shrinkWrap: true,
+      children: croppedFaces
+          .map((e) => SizedBox(
+                width: 80,
+                height: 80,
+                child: Image.memory(
+                  Uint8List.fromList(image_.encodeJpg(e)),
+                  scale: 0.1,
+                ),
+              ))
+          .toList(),
+    );
+  }
 
-  return frame.image;
+  void addToFaceStorage(List<int> encodedImg) {
+    faceStorage.add(encodedImg);
+  }
+
+  Future onServerFeedback(RecognizedFace recognizedFace) async {
+    print("recognized " + recognizedFace.trackingId.toString());
+  }
 }
